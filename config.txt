@@ -1,0 +1,4 @@
+Host=NOVAPRIME\ANALISIDB
+User=NOVAPRIME
+Pass=@hotmail2
+DB=Divisas
