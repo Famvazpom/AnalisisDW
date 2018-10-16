@@ -1,4 +1,4 @@
-/*CREATE PROC SEL_TODO_MONEDAS
+CREATE PROC SEL_TODO_MONEDAS
 AS
 BEGIN
 	SELECT * FROM Monedas;
@@ -22,8 +22,7 @@ BEGIN
 	    );
 END;
 GO
-*/
-/*
+
 CREATE PROC INSERTA_DIVISA
 	@Moneda  CHAR(50),
 	@Cambio Money,
@@ -35,7 +34,5 @@ AS
 		INSERT INTO dbo.Divisa_Actual VALUES ( @ID_MONEDA,@Cambio);
 		SELECT * FROM Divisa_Actual;
 END;
-*/
-
-USE Divisas;
-EXECUTE	INSERTA_DIVISA @Moneda= 'PESO',@Cambio = 22.5,@Fecha = "2018-06-19";
+GO
+exit

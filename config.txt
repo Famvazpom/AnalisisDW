@@ -1,4 +1,4 @@
-Host=NOVAPRIME\ANALISIDB
+Host=famvazpom-ThinkPad-T410
 User=NOVAPRIME
 Pass=@hotmail2
 DB=Divisas
