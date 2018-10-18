@@ -15,10 +15,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors', true);
 $serverName = exec("./sh/getdata.sh Host "); //serverName
-$user = exec("./sh/getdata.sh User 2>&1");
-$pass = exec("./sh/getdata.sh  Pass 2>&1");
-$db = exec("./sh/getdata.sh DB 2>&1");
-$connectionInfo = array( "Database"=> $db, "UID"=>$user, "PWD"=>$pass);
+$user = exec("./sh/getdata.sh User ");
+$pass = exec("./sh/getdata.sh  Pass ");
+$db = exec("./sh/getdata.sh DB ");
 $conn = mssql_connect( $serverName, $user,$pass);
 
 $query = "EXECUTE SEL_TODO_MONEDAS";

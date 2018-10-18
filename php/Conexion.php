@@ -1,25 +1,56 @@
 <?php 
 /*
-    PARA EJECUTAR UN PROCEDURE SE NECESITA USAR 2 FUNCIONES, UNA PARA PREPARARLO Y OTRA PARA EJECUTARLO:
-    PARA PREPARARLO SE USA ESTE:
-        $result = sqlsrv_prepare($conexion,$query);
-    DONDE EN QUERY VA EL SCRIPT PARA EMPEZAR EL PROCEDURE
-        $query = "EXEC NOMBRE_DE_PROCEDURE";
-    PARA EJECUTARLO DESPUES DE PREPARARLO SE UTILIZA:
-        sqlsrv_execute($result);
-    Y DESPUES SE TRABAJA NORMAL
+     Conexion a la base de datos.
+       Atributos publicos
+           $conn -> Conexion
+       Atributos privados
+            $pass -> Password de la base de datos
+            $usr -> Usuario de la base de datos
+            $db -> Base de datos a la que se conectara
+            $host -> Lugar donde se encuentra la base de datos
 */
-$serverName = "NOVAPRIME\ANALISIDB"; //serverName
-$user="NOVAPRIME";
-$pass="@hotmail2";
-$bd="Divisas";
-$connectionInfo = array( "Database"=> $bd, "UID"=>$user, "PWD"=>$pass);
-$conn = sqlsrv_connect( $serverName, $connectionInfo);
-if( $conn ) {
-     echo "Conexión establecida.<br />";
-}else{
-     echo "Conexión no se pudo establecer.<br />";
-     die( print_r( sqlsrv_errors(), true));
-}
-    
+    class Conexion
+    {
+        public $conn;
+        private $pass;
+        private $usr;
+        private $db;
+        private $host;
+        
+        function __construct()
+        {
+            /*
+                1.- Se obtienen los datos con el script getdata.sh
+                2.- Conectamos a la base de datos
+                3.- Manejo de errores
+                    3.1.- En caso de no lograr la conexion terminamos la funcion
+                    3.2.- En caso contrario se envia el mensaje de exito
+            */  
+            $this -> pass = exec("./../sh/getdata.sh Pass ");
+            $this -> host = exec("./../sh/getdata.sh Host");
+            $this -> usr = exec("./../sh/getdata.sh User");
+            $this -> db = exec("./../sh/getdata.sh DB");
+            $this -> conn = mssql_connect( $this -> host, $this -> usr,$this -> pass);
+            if (!$this -> conn) {
+                die(print_r("MSSQL ERROR:". mssql_get_last_message()));
+            }
+            else
+            {
+                echo "Conexion establecida";
+            }
+        }
+        function __destruct()
+        {
+            /*
+                Funcion Destructor
+                    1.- Cerramos la conexion a la base de datos
+                    2.- Apuntamos todas las variables a NULL
+            */
+            mssql_close($this -> conn);
+            $this -> pass = null;
+            $this -> usr = null;
+            $this -> db = null;
+            $this -> host = null;
+        }
+    }
 ?>
