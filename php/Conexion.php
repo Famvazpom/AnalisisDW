@@ -36,9 +36,10 @@
             }
             else
             {
-                echo "Conexion establecida";
+                echo "Conexion establecida<br>";
             }
         }
+        
         function __destruct()
         {
             /*

@@ -1,1 +1,1 @@
-cat mexico.txt| cut -d "[" -f2 | cut -d ":" -f3 | tr -d "}]\""
+cat ../mexico.txt| cut -d "[" -f2 | cut -d ":" -f3 | tr -d "}]\""
