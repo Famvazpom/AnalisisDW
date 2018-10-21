@@ -28,6 +28,7 @@
 		private $error;
 		private $mes;
 		private $dia;
+		private $anio;
 		
 		private function DescargaArchivo()
 		{
@@ -109,6 +110,12 @@
 
 		}
 
+		private function ArmaCanCSVURL()
+		{
+			$this -> url = "https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/csv?start_date=".$this -> fecha;
+			$this -> archivo = "Can.csv";
+		}
+
 		private function ObtieneDivisaCanada()
 		{
 			$this -> divisa = exec("./../sh/DivisaCan.sh ".$this -> fecha." 2>&1");
@@ -122,12 +129,32 @@
 			//Insertar a la base de datos
 		}
 
+		private function ObtieneDivisaCanadaCSV()
+		{
+			$this -> divisa = exec("./../sh/DivisaCanCSV.sh ".$this -> fecha." 2>&1");
+			if ($this -> divisa == null) {
+				echo "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana<br>";
+				unlink("../".$this -> archivo);
+				return;
+			}
+			echo $this -> divisa;
+			unlink("../".$this -> archivo);
+		}
+
 		public function DivisaCan($fecha)
 		{
 			$this -> fecha = $fecha;
 			$this -> ArmaCanURL();
 			$this -> DescargaArchivo();
 			$this -> ObtieneDivisaCanada();
+		}
+
+		public function DivisaCanCSV($fecha)
+		{
+			$this -> fecha = $fecha;
+			$this -> ArmaCanCSVURL();
+			$this -> DescargaArchivo();
+			$this -> ObtieneDivisaCanadaCSV();
 		}
 
 		private function ArmaUnEurlink()
@@ -159,6 +186,35 @@
 			$this -> DescargaArchivo();
 			$this -> ObtieneDivisaUnEur();
 		}
+
+		private function ArmaArgLink()
+		{
+			$this -> url = "http://www.bcra.gob.ar/PublicacionesEstadisticas/Evolucion_moneda_2.asp?Fecha=".$this -> fecha."&Moneda=2";
+			$this -> archivo = "Argen.txt";
+		}
+
+		private function ObtieneDivisaArg()
+		{
+			$this -> divisa = exec("./../sh/DivisaArgen.sh ".$this -> dia." ".$this -> mes." ".$this -> anio." 2>&1");
+			if ($this -> divisa == null) {
+				echo "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana<br>";
+				unlink("../".$this -> archivo);
+				return;
+			}
+			echo $this -> divisa;
+			unlink("../".$this -> archivo);
+			//Insertar a la BD
+		}
+
+		public function DivisaArgen($dia,$mes,$anio)
+		{
+			$this -> dia = $dia;
+			$this -> mes = $mes;
+			$this -> anio = $anio;
+			$this -> ArmaArglink();
+			$this -> DescargaArchivo();
+			$this -> ObtieneDivisaArg();
+		}
 	}
 $meh = new Operaciones();
 /*
@@ -166,8 +222,12 @@ $meh -> DivisaMexico("11/06/2018");
 echo "<br>";
 $meh -> DivisaBrazil();
 echo "<br>";
+*/
 $meh -> DivisaCan("2018-10-17");
 echo "<br>";
-$meh -> DivisaUnEur("15","Oct");
-/*
+
+//$meh -> DivisaUnEur("15","Oct");
+
+
+$meh -> DivisaCanCSV("2018-10-17");
 ?>
