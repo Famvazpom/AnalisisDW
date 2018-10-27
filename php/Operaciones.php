@@ -1,5 +1,7 @@
 <?php
 	require('Conexion.php');
+	error_reporting(E_ALL);
+ini_set('display_errors', true);
 	/*
 		TO DOOMS
 			* INSERTAR A LA BASE DE DATOS LAS DIVISAS OBTENIDAS ACTUALMENTE
@@ -29,11 +31,22 @@
 		private $mes;
 		private $dia;
 		private $anio;
+		private $conn;
+		private $query;
 		
 		private function DescargaArchivo()
 		{
 			//Esta funcion descargara el archivo de la pagina
 			file_put_contents("../".$this -> archivo,fopen($this -> url,'r'));	
+		}
+
+		private function GuardaErrores($mensaje)
+		{
+			echo "ERROR";
+			$file = fopen("../errores.log", "a");
+			$date = exec("date");
+			fwrite($file,$date.",".$mensaje."\n");
+			fclose($file);
 		}
 		
 		private function ArmaMexURL()
@@ -62,7 +75,8 @@
 			*/
 			$this -> divisa = exec("./../sh/DivisaMex.sh");
 			if ($this -> divisa == "N/E" | $this -> divisa == null) {
-				echo "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana<br>";
+				$mesaje = "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana";
+				$this -> GuardaErrores($mensaje);
 				unlink("../".$this -> archivo);
 				return;
 			}
@@ -83,7 +97,8 @@
 		{
 			$this -> divisa = exec("./../sh/DivisaBra.sh");
 			if ($this -> divisa == null) {
-				echo "ERROR 2: Archivo descargado vacio<br>";
+				$mensaje = "ERROR 2: Archivo descargado vacio";
+				$this -> GuardaErrores($mensaje);
 				unlink("../".$this -> archivo);
 				return;
 			}
@@ -107,6 +122,7 @@
 		{
 			$this -> url = "https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/json?start_date=".$this -> fecha;
 			$this -> archivo = "canada.txt";
+			$this -> pais = "CANADA";
 
 		}
 
@@ -114,18 +130,21 @@
 		{
 			$this -> url = "https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/csv?start_date=".$this -> fecha;
 			$this -> archivo = "Can.csv";
+			$this -> pais = "CANADA";
 		}
 
 		private function ObtieneDivisaCanada()
 		{
 			$this -> divisa = exec("./../sh/DivisaCan.sh ".$this -> fecha." 2>&1");
 			if ($this -> divisa == null) {
-				echo "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana<br>";
+				$mensaje = "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana";
+				$this -> GuardaErrores($mensaje);
 				unlink("../".$this -> archivo);
 				return;
 			}
 			echo $this -> divisa;
 			unlink("../".$this -> archivo);
+			//$this -> InsertaDB();
 			//Insertar a la base de datos
 		}
 
@@ -133,7 +152,8 @@
 		{
 			$this -> divisa = exec("./../sh/DivisaCanCSV.sh ".$this -> fecha." 2>&1");
 			if ($this -> divisa == null) {
-				echo "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana<br>";
+				$mensaje = "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana";
+				$this -> GuardaErrores($mensaje);
 				unlink("../".$this -> archivo);
 				return;
 			}
@@ -143,6 +163,12 @@
 
 		public function DivisaCan($fecha)
 		{
+			/*
+				Formato de fecha para Canada
+					$fecha = YYYY-MM-DD
+				Ejemplo
+					$fecha = 2018-06-10
+			*/
 			$this -> fecha = $fecha;
 			$this -> ArmaCanURL();
 			$this -> DescargaArchivo();
@@ -151,6 +177,12 @@
 
 		public function DivisaCanCSV($fecha)
 		{
+			/*
+				Formato de fecha para Canada
+					$fecha = YYYY-MM-DD
+				Ejemplo
+					$fecha = 2018-06-10
+			*/
 			$this -> fecha = $fecha;
 			$this -> ArmaCanCSVURL();
 			$this -> DescargaArchivo();
@@ -161,6 +193,7 @@
 		{
 			$this -> url = "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-usd.en.html";
 			$this -> archivo = "UnEur.txt";
+			$this -> pais = "UNION EUROPEA";
 		}
 
 		private function ObtieneDivisaUnEur()
@@ -168,7 +201,8 @@
 			$this -> divisa = exec("./../sh/DivisaUnE.sh ".$this -> mes." ".$this -> dia);
 			if($this -> divisa == "&nbsp;" || $this -> divisa == null)
 			{
-				echo "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana<br>";
+				$mensaje = "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana";
+				$this -> GuardaErrores($mensaje);
 				unlink("../".$this -> archivo);
 				return;
 			}
@@ -180,6 +214,14 @@
 		
 		public function DivisaUnEur($dia,$mes)
 		{
+			/*
+				Formato de fehca para Union Europea
+					$dia = DD
+					$mes = MMM // El mes va con 3 letras
+				Ejemplo
+					$dia = 10
+					$mes  = Jun
+			*/
 			$this -> dia = $dia;
 			$this -> mes = $mes;
 			$this -> ArmaUnEurlink();
@@ -187,47 +229,106 @@
 			$this -> ObtieneDivisaUnEur();
 		}
 
-		private function ArmaArgLink()
+		private function ArmaArgURL()
 		{
 			$this -> url = "http://www.bcra.gob.ar/PublicacionesEstadisticas/Evolucion_moneda_2.asp?Fecha=".$this -> fecha."&Moneda=2";
 			$this -> archivo = "Argen.txt";
+			$this -> pais = "ARGENTINA";
 		}
 
 		private function ObtieneDivisaArg()
 		{
 			$this -> divisa = exec("./../sh/DivisaArgen.sh ".$this -> dia." ".$this -> mes." ".$this -> anio." 2>&1");
 			if ($this -> divisa == null) {
-				echo "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana<br>";
+
+				$mensaje = "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana";
+				$this -> GuardaErrores($mensaje);
 				unlink("../".$this -> archivo);
 				return;
 			}
 			echo $this -> divisa;
 			unlink("../".$this -> archivo);
+
 			//Insertar a la BD
 		}
 
 		public function DivisaArgen($dia,$mes,$anio)
 		{
+			/*
+				Formato de fecha para Argentina:
+					Fecha separada por partes:
+						$dia = DD
+						$mes = MM
+						$anio = YYYY
+					Ejemplo
+						$dia = 09
+						$mes = 06
+						$anio = 2018
+			*/
 			$this -> dia = $dia;
 			$this -> mes = $mes;
 			$this -> anio = $anio;
-			$this -> ArmaArglink();
+			$this -> ArmaArgURL();
 			$this -> DescargaArchivo();
 			$this -> ObtieneDivisaArg();
 		}
+
+		private function ArmaColURL()
+		{
+
+			$this -> url = "https://www.superfinanciera.gov.co/descargas?com=institucional&name=pubFile1010997&downloadname=historia.csv" ; 
+			$this -> archivo = "Cop.txt";
+			$this -> pais = "COLOMBIA"; 
+		}
+
+		private function ObtieneDivisaCol()
+		{
+			$this -> divisa = exec("./../sh/DivisaCol.sh ".$this -> fecha." 2>&1");
+			if ($this -> divisa == null) {
+				$mensaje = "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana";
+				$this -> GuardaErrores($mensaje);
+				unlink("../".$this -> archivo);
+				return;
+			}
+			echo $this -> divisa;
+			unlink("../".$this -> archivo);
+		}
+
+		public function DivisaCol($fecha)
+		{
+			/*
+				Formato de fecha para colombia:
+					MM/DD/YYYY
+				Ejemplo:
+					10/10/2018
+				Octubre 10 de 2018
+			*/
+			$this -> fecha = $fecha;
+			$this -> ArmaColURL();
+			$this -> DescargaArchivo();
+			$this -> ObtieneDivisaCol();
+		}
+
+		/*private function InsertaDB()
+		{
+			$this -> conn = new Conexion();
+			$this -> query = "EXEC INSERTA_DIVISA @Moneda = ".$this ->pais." @Cambio =".$this -> divisa." @Fecha =".$this -> fecha;
+		}
+		*/
 	}
 $meh = new Operaciones();
-/*
+echo "<br>MEXICO: ";
 $meh -> DivisaMexico("11/06/2018");
-echo "<br>";
+echo "<br>BRAZIL: ";
 $meh -> DivisaBrazil();
-echo "<br>";
-*/
+echo "<br>CANADA: ";
 $meh -> DivisaCan("2018-10-17");
-echo "<br>";
-
-//$meh -> DivisaUnEur("15","Oct");
-
-
+echo "<br>ARGENTINA: ";
+$meh -> DivisaArgen("08","06","2018");
+echo "<br>UNION EUROPEA: ";
+$meh -> DivisaUnEur("15","Oct");
+echo "<br>CANADA CSV: ";
 $meh -> DivisaCanCSV("2018-10-17");
+echo "<br>COLOMBIA: ";
+$meh -> DivisaCol("11/10/2018");
 ?>
