@@ -24,15 +24,24 @@ END;
 GO
 
 CREATE PROC INSERTA_DIVISA
-	@Moneda  CHAR(50),
+	@Pais  CHAR(50),
 	@Cambio Money,
 	@Fecha Date
 AS 
 	BEGIN
 		DECLARE @ID_MONEDA INT;
-		SELECT @ID_MONEDA = Id_Moneda FROM Monedas WHERE Moneda = @Moneda;
-		INSERT INTO dbo.Divisa_Actual VALUES ( @ID_MONEDA,@Cambio);
-		SELECT * FROM Divisa_Actual;
+		SELECT @ID_MONEDA = Id_Moneda FROM Monedas WHERE Pais = @Pais;
+		IF (@ID_MONEDA IS NOT NULL)
+			IF	(SELECT COUNT(*) FROM dbo.Divisas WHERE Fecha = @Fecha AND Moneda = @ID_MONEDA) > 0 
+				UPDATE dbo.Divisas SET dbo.Divisas.TipoCambio = @Cambio WHERE Fecha = @Fecha AND Moneda = @ID_MONEDA;
+			ELSE	
+				INSERT INTO dbo.Divisas(Moneda,TipoCambio,Fecha) VALUES (
+				    @ID_MONEDA, -- Moneda - int
+				   @Cambio, -- TipoCambio - money
+					@Fecha -- Fecha - date
+					);
+		ELSE
+			PRINT N'MONEDA NO RECONOCIDA';
 END;
 GO
 exit

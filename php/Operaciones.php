@@ -33,7 +33,8 @@ ini_set('display_errors', true);
 		private $anio;
 		private $conn;
 		private $query;
-		
+		private $fechasql;
+
 		private function DescargaArchivo()
 		{
 			//Esta funcion descargara el archivo de la pagina
@@ -45,7 +46,7 @@ ini_set('display_errors', true);
 			echo "ERROR";
 			$file = fopen("../errores.log", "a");
 			$date = exec("date");
-			fwrite($file,$date.",".$mensaje."\n");
+			fwrite($file,$date.",".$mensaje."PAIS:".$this -> pais."\n");
 			fclose($file);
 		}
 		
@@ -62,7 +63,7 @@ ini_set('display_errors', true);
 			*/
 			$this-> url = "http://www.banxico.org.mx/tipcamb/datosieajax?accion=dato&idSeries=SF43786&decimales=2&fecha=".$this -> fecha;
 			$this -> archivo = "mexico.txt";
-			$this -> pais = "MEXICO";
+			$this -> pais = "\"MEXICO\"";
 		}
 		
 		private function ObtieneDivisaMexico()
@@ -82,6 +83,9 @@ ini_set('display_errors', true);
 			}
 			echo $this -> divisa;
 			unlink("../".$this -> archivo);
+			$this -> ObtieneFechaPartes();
+			$this -> CreaFechaSQL();
+			$this -> InsertaDB();
 			//Insertar en la base de datos
 		}
 
@@ -91,6 +95,7 @@ ini_set('display_errors', true);
 			$this -> ArmaMexURL();
 			$this -> DescargaArchivo();
 			$this -> ObtieneDivisaMexico();
+
 		}
 
 		private function ObtieneDivisaBrazil()
@@ -104,6 +109,8 @@ ini_set('display_errors', true);
 			}
 			echo $this -> divisa;
 			unlink("../".$this -> archivo);
+			echo "<br>".$this -> fechasql;
+			$this -> InsertaDB();
 			//Insertar a la base de datos
 		}
 
@@ -114,6 +121,7 @@ ini_set('display_errors', true);
 			*/
 			$this -> url = "https://ptax.bcb.gov.br/ptax_internet/consultarUltimaCotacaoDolar.do";
 			$this -> archivo = "brazil.txt";
+			$this -> fecha = date("Y/m/d");
 			$this -> DescargaArchivo();
 			$this -> ObtieneDivisaBrazil();
 		}
@@ -122,7 +130,7 @@ ini_set('display_errors', true);
 		{
 			$this -> url = "https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/json?start_date=".$this -> fecha;
 			$this -> archivo = "canada.txt";
-			$this -> pais = "CANADA";
+			$this -> pais = "\"CANADA\"";
 
 		}
 
@@ -130,7 +138,7 @@ ini_set('display_errors', true);
 		{
 			$this -> url = "https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/csv?start_date=".$this -> fecha;
 			$this -> archivo = "Can.csv";
-			$this -> pais = "CANADA";
+			$this -> pais = "\"CANADA\"";
 		}
 
 		private function ObtieneDivisaCanada()
@@ -144,7 +152,9 @@ ini_set('display_errors', true);
 			}
 			echo $this -> divisa;
 			unlink("../".$this -> archivo);
-			//$this -> InsertaDB();
+			$this -> fechasql = exec("echo ".$this -> fecha."|tr '-' '/'");
+			echo "<br>".$this -> fechasql;
+			$this -> InsertaDB();
 			//Insertar a la base de datos
 		}
 
@@ -159,6 +169,9 @@ ini_set('display_errors', true);
 			}
 			echo $this -> divisa;
 			unlink("../".$this -> archivo);
+			$this -> fechasql = exec("echo ".$this -> fecha."|tr '-' '/'");
+			echo "<br>".$this -> fechasql;
+			$this -> InsertaDB();
 		}
 
 		public function DivisaCan($fecha)
@@ -193,7 +206,7 @@ ini_set('display_errors', true);
 		{
 			$this -> url = "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-usd.en.html";
 			$this -> archivo = "UnEur.txt";
-			$this -> pais = "UNION EUROPEA";
+			$this -> pais = "\"UNION EUROPEA\"";
 		}
 
 		private function ObtieneDivisaUnEur()
@@ -209,10 +222,13 @@ ini_set('display_errors', true);
 			
 			echo $this -> divisa;
 			unlink("../".$this -> archivo);
+			$this -> TransformaMes();
+			$this -> CreaFechaSQL();
+			$this -> InsertaDB();
 			//Insertar a la Base de Datos
 		}
 		
-		public function DivisaUnEur($dia,$mes)
+		public function DivisaUnEur($dia,$mes,$anio)
 		{
 			/*
 				Formato de fehca para Union Europea
@@ -224,6 +240,7 @@ ini_set('display_errors', true);
 			*/
 			$this -> dia = $dia;
 			$this -> mes = $mes;
+			$this -> anio = $anio;
 			$this -> ArmaUnEurlink();
 			$this -> DescargaArchivo();
 			$this -> ObtieneDivisaUnEur();
@@ -233,7 +250,7 @@ ini_set('display_errors', true);
 		{
 			$this -> url = "http://www.bcra.gob.ar/PublicacionesEstadisticas/Evolucion_moneda_2.asp?Fecha=".$this -> fecha."&Moneda=2";
 			$this -> archivo = "Argen.txt";
-			$this -> pais = "ARGENTINA";
+			$this -> pais = "\"ARGENTINA\"";
 		}
 
 		private function ObtieneDivisaArg()
@@ -248,7 +265,8 @@ ini_set('display_errors', true);
 			}
 			echo $this -> divisa;
 			unlink("../".$this -> archivo);
-
+			$this -> CreaFechaSQL();
+			$this -> InsertaDB();
 			//Insertar a la BD
 		}
 
@@ -278,7 +296,7 @@ ini_set('display_errors', true);
 
 			$this -> url = "https://www.superfinanciera.gov.co/descargas?com=institucional&name=pubFile1010997&downloadname=historia.csv" ; 
 			$this -> archivo = "Cop.txt";
-			$this -> pais = "COLOMBIA"; 
+			$this -> pais = "\"COLOMBIA\""; 
 		}
 
 		private function ObtieneDivisaCol()
@@ -291,7 +309,10 @@ ini_set('display_errors', true);
 				return;
 			}
 			echo $this -> divisa;
+			$this -> ObtieneFechaPartes();
+			$this -> CreaFechaSQL();
 			unlink("../".$this -> archivo);
+			$this -> InsertaDB();
 		}
 
 		public function DivisaCol($fecha)
@@ -309,26 +330,157 @@ ini_set('display_errors', true);
 			$this -> ObtieneDivisaCol();
 		}
 
-		/*private function InsertaDB()
+		private function ArmaRepDomURL()
+		{
+			$this -> url = "https://www.google.com/search?ei=a1vVW_OXM-ufjgSGs7eYDQ&q=USD+to+DOP&oq=USD+to+DOP&gs_l=psy-ab.3..0i67k1j0i22i30k1l9.2823.8728.0.8940.20.17.0.3.3.0.164.2013.0j16.17.0....0...1c.1.64.psy-ab..0.19.2024.0..0j0i8i30k1j0i8i10i30k1j0i7i30i19k1j0i8i10i30i19k1j0i8i30i19k1j0i30i19k1j0i7i10i30k1j0i7i30k1j0i131k1j0i131i67k1.96.D1UIt6zzAh8";
+			$this -> archivo = "RepDom.txt";
+			$this -> pais = "\"REPUBLICA DOMINICANA\"";
+		}
+
+		private function ObtieneDivisaRepDom()
+		{
+			$this -> divisa = exec("./../sh/DivisaRepDom.sh");
+			if ($this -> divisa == null) {
+				$mensaje = "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana";
+				$this -> GuardaErrores($mensaje);
+				unlink("../".$this -> archivo);
+				return;
+			}
+			echo $this -> divisa;
+			$this -> TransformaMes();
+			unlink("../".$this -> archivo);
+			$this -> InsertaDB();
+		}
+
+		public function DivisaRepDom()
+		{
+			/*
+				FORMATO DE FECHA
+					$anio = YYYY
+					$mes = MMM // Mes escrito con 3 letras del espanol
+					$dia = DD
+			*/	
+			$this -> fechasql = date("Y/m/d");
+			$this -> ArmaRepDomURL();
+			$this -> DescargaArchivo();
+			$this -> ObtieneDivisaRepDom();
+		}
+
+		private function InsertaDB()
 		{
 			$this -> conn = new Conexion();
-			$this -> query = "EXEC INSERTA_DIVISA @Moneda = ".$this ->pais." @Cambio =".$this -> divisa." @Fecha =".$this -> fecha;
+			$this -> query = "EXEC INSERTA_DIVISA @Pais =".$this ->pais." ,@Cambio =".$this -> divisa." ,@Fecha =\"".$this -> fechasql."\"";
+			echo $this -> query;
+			$result = mssql_query($this -> query); // PREPARAMOS
+			if (!$result || !mssql_select_db($this -> db)) //VERIFICAMOS ERRORES
+    		{
+ 				echo "ERROR";
+ 				$mensaje = mssql_get_last_message();
+ 				$this -> GuardaErrores($mensaje);
+ 				die('MSSQL error: '. mssql_get_last_message()); //EN CASO DE TENER ALGUN ERROR LOS IMPRIMIMOS Y TERMINAMOS LA CORRIDA
+ 			}
 		}
-		*/
+
+		private function ObtieneFechaPartes()
+		{
+			if ($this -> pais =="COLOMBIA") 
+			{
+				$this -> dia = exec("./../sh/Fechapartes.sh ".$this -> fecha." 2");
+				$this -> mes = exec("./../sh/Fechapartes.sh ".$this -> fecha." 1");
+			}
+			else
+			{
+				$this -> dia = exec("./../sh/Fechapartes.sh ".$this -> fecha." 1 ");
+				$this -> mes = exec("./../sh/Fechapartes.sh ".$this -> fecha." 2");
+			}
+			$this -> anio = exec("./../sh/Fechapartes.sh ".$this -> fecha." 3");
+
+		}
+
+		private function TransformaMes()
+		{
+			switch ($this -> mes) 
+			{
+				case 'Jan':
+					$this -> mes = "01";
+					break;
+				case 'Feb':
+					$this -> mes = "02";
+					break;
+				case 'Mar':
+					$this -> mes = "03";
+					break;
+				case 'Apr':
+					$this -> mes = "04";
+					break;
+				case 'May':
+					$this -> mes = "05";
+					break;
+				case 'Jun':
+					$this -> mes = "06";
+					break;
+				case 'Jul':
+					$this -> mes = "07";
+					break;
+				case 'Aug':
+					$this -> mes = "08";
+					break;
+				case 'Sep':
+					$this -> mes = "09";
+					break;
+				case 'Oct':
+					$this -> mes = "10";
+					break;
+				case 'Nov':
+					$this -> mes = "11";
+					break;
+				case 'Dec':
+					$this -> mes = "12";
+					break;
+				case 'Ene':
+					$this -> mes = "01";
+					break;
+				case 'Abr':
+					$this -> mes = "04";
+					break;
+				case 'Ago':
+					$this -> mes = "08";
+					break;
+				case 'Dic':
+					$this -> mes = "12";
+					break;		
+			}
+		}
+		private function CreaFechaSQL()
+		{
+			$this -> fechasql = $this -> anio."/".$this -> mes."/".$this -> dia;
+			echo "<br>".$this -> fechasql;
+		}
 	}
 $meh = new Operaciones();
+
 echo "<br>MEXICO: ";
 $meh -> DivisaMexico("11/06/2018");
+
 echo "<br>BRAZIL: ";
 $meh -> DivisaBrazil();
+
 echo "<br>CANADA: ";
 $meh -> DivisaCan("2018-10-17");
+
 echo "<br>ARGENTINA: ";
 $meh -> DivisaArgen("08","06","2018");
+
 echo "<br>UNION EUROPEA: ";
-$meh -> DivisaUnEur("15","Oct");
+$meh -> DivisaUnEur("15","Oct","2018");
+
 echo "<br>CANADA CSV: ";
 $meh -> DivisaCanCSV("2018-10-17");
+
 echo "<br>COLOMBIA: ";
-$meh -> DivisaCol("11/10/2018");
+$meh -> DivisaCol("10/11/2018");
+
+/*echo "<br>REPUBLICA DOMINICANA: ";
+$meh -> DivisaRepDom();
+*/
 ?>

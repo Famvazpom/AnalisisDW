@@ -1,0 +1,18 @@
+Sat Oct 27 23:54:23 EST 2018,ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semanaPAIS:COLOMBIA
+Sun Oct 28 00:00:16 EST 2018,ERROR 2: Archivo descargado vacioPAIS:MEXICO
+Sun Oct 28 02:38:04 EST 2018,Database '' does not exist. Make sure that the name is entered correctly.PAIS:REPUBLICA DOMINICANA
+Sun Oct 28 02:38:54 EST 2018,Incorrect syntax near 'DOMINICANA'.PAIS:REPUBLICA DOMINICANA
+Sun Oct 28 02:40:25 EST 2018,ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semanaPAIS:"REPUBLICA DOMINICANA"
+Sun Oct 28 02:40:33 EST 2018,ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semanaPAIS:"REPUBLICA DOMINICANA"
+Sun Oct 28 02:40:36 EST 2018,ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semanaPAIS:"REPUBLICA DOMINICANA"
+Sun Oct 28 02:41:06 EST 2018,ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semanaPAIS:"REPUBLICA DOMINICANA"
+Sun Oct 28 02:41:45 EST 2018,ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semanaPAIS:"REPUBLICA DOMINICANA"
+Sun Oct 28 02:43:26 EST 2018,ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semanaPAIS:"REPUBLICA DOMINICANA"
+Sun Oct 28 02:47:51 EST 2018,ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semanaPAIS:"REPUBLICA DOMINICANA"
+Sun Oct 28 02:48:20 EST 2018,ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semanaPAIS:"REPUBLICA DOMINICANA"
+Sun Oct 28 02:55:30 EST 2018,Incorrect syntax near '@Cambio'.PAIS:"MEXICO"
+Sun Oct 28 02:56:15 EST 2018,Incorrect syntax near '@Cambio'.PAIS:"MEXICO"
+Sun Oct 28 02:56:46 EST 2018,Incorrect syntax near '@Cambio'.PAIS:"MEXICO"
+Sun Oct 28 02:57:07 EST 2018,Incorrect syntax near '/'.PAIS:"MEXICO"
+Sun Oct 28 02:57:55 EST 2018,Database '' does not exist. Make sure that the name is entered correctly.PAIS:"MEXICO"
+Sun Oct 28 02:59:50 EST 2018,Database '' does not exist. Make sure that the name is entered correctly.PAIS:"MEXICO"
