@@ -12,9 +12,9 @@
     class Conexion
     {
         public $conn;
+        public $db;
         private $pass;
         private $usr;
-        private $db;
         private $host;
         
         function __construct()
@@ -31,12 +31,8 @@
             $this -> usr = exec("./../sh/getdata.sh User");
             $this -> db = exec("./../sh/getdata.sh DB");
             $this -> conn = mssql_connect( $this -> host, $this -> usr,$this -> pass);
-            if (!$this -> conn) {
+            if (!$this -> conn || !mssql_select_db($this -> db,$this -> conn)) {
                 die(print_r("MSSQL ERROR:". mssql_get_last_message()));
-            }
-            else
-            {
-                echo "Conexion establecida<br>";
             }
         }
         

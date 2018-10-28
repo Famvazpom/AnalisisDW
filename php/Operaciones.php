@@ -121,7 +121,8 @@ ini_set('display_errors', true);
 			*/
 			$this -> url = "https://ptax.bcb.gov.br/ptax_internet/consultarUltimaCotacaoDolar.do";
 			$this -> archivo = "brazil.txt";
-			$this -> fecha = date("Y/m/d");
+			$this -> pais = "BRAZIL";
+			$this -> fechasql = date("Y/m/d");
 			$this -> DescargaArchivo();
 			$this -> ObtieneDivisaBrazil();
 		}
@@ -332,7 +333,7 @@ ini_set('display_errors', true);
 
 		private function ArmaRepDomURL()
 		{
-			$this -> url = "https://www.google.com/search?ei=a1vVW_OXM-ufjgSGs7eYDQ&q=USD+to+DOP&oq=USD+to+DOP&gs_l=psy-ab.3..0i67k1j0i22i30k1l9.2823.8728.0.8940.20.17.0.3.3.0.164.2013.0j16.17.0....0...1c.1.64.psy-ab..0.19.2024.0..0j0i8i30k1j0i8i10i30k1j0i7i30i19k1j0i8i10i30i19k1j0i8i30i19k1j0i30i19k1j0i7i10i30k1j0i7i30k1j0i131k1j0i131i67k1.96.D1UIt6zzAh8";
+			$this -> url = "http://free.currencyconverterapi.com/api/v5/convert?q=USD_DOP&compact=y";
 			$this -> archivo = "RepDom.txt";
 			$this -> pais = "\"REPUBLICA DOMINICANA\"";
 		}
@@ -347,7 +348,7 @@ ini_set('display_errors', true);
 				return;
 			}
 			echo $this -> divisa;
-			$this -> TransformaMes();
+			echo "<br>".$this -> fechasql;
 			unlink("../".$this -> archivo);
 			$this -> InsertaDB();
 		}
@@ -369,21 +370,21 @@ ini_set('display_errors', true);
 		private function InsertaDB()
 		{
 			$this -> conn = new Conexion();
-			$this -> query = "EXEC INSERTA_DIVISA @Pais =".$this ->pais." ,@Cambio =".$this -> divisa." ,@Fecha =\"".$this -> fechasql."\"";
-			echo $this -> query;
+			$this -> query = "EXEC INSERTA_DIVISA @Pais =".$this ->pais." ,@Cambio =\"".$this -> divisa."\" ,@Fecha =\"".$this -> fechasql."\"";
 			$result = mssql_query($this -> query); // PREPARAMOS
-			if (!$result || !mssql_select_db($this -> db)) //VERIFICAMOS ERRORES
+			if (!$result ) //VERIFICAMOS ERRORES
     		{
- 				echo "ERROR";
+ 				echo "<br>ERROR";
  				$mensaje = mssql_get_last_message();
  				$this -> GuardaErrores($mensaje);
  				die('MSSQL error: '. mssql_get_last_message()); //EN CASO DE TENER ALGUN ERROR LOS IMPRIMIMOS Y TERMINAMOS LA CORRIDA
  			}
+ 			unset($this -> conn);
 		}
 
 		private function ObtieneFechaPartes()
 		{
-			if ($this -> pais =="COLOMBIA") 
+			if ($this -> pais =="\"COLOMBIA\"") 
 			{
 				$this -> dia = exec("./../sh/Fechapartes.sh ".$this -> fecha." 2");
 				$this -> mes = exec("./../sh/Fechapartes.sh ".$this -> fecha." 1");
@@ -480,7 +481,7 @@ $meh -> DivisaCanCSV("2018-10-17");
 echo "<br>COLOMBIA: ";
 $meh -> DivisaCol("10/11/2018");
 
-/*echo "<br>REPUBLICA DOMINICANA: ";
+echo "<br>REPUBLICA DOMINICANA: ";
 $meh -> DivisaRepDom();
-*/
+
 ?>
