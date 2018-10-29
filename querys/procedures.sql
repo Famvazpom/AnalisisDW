@@ -30,18 +30,26 @@ CREATE PROC INSERTA_DIVISA
 AS 
 	BEGIN
 		DECLARE @ID_MONEDA INT;
+		DECLARE @MENSAJE VARCHAR(200);
+		DECLARE @USUARIO VARCHAR(70);
+		SELECT @USUARIO = CURRENT_USER;
 		SELECT @ID_MONEDA = Id_Moneda FROM Monedas WHERE Pais = @Pais;
-		IF (@ID_MONEDA IS NOT NULL)
-			IF	(SELECT COUNT(*) FROM dbo.Divisas WHERE Fecha = @Fecha AND Moneda = @ID_MONEDA) > 0 
-				UPDATE dbo.Divisas SET dbo.Divisas.TipoCambio = @Cambio WHERE Fecha = @Fecha AND Moneda = @ID_MONEDA;
-			ELSE	
-				INSERT INTO dbo.Divisas(Moneda,TipoCambio,Fecha) VALUES (
-				    @ID_MONEDA, -- Moneda - int
-				   @Cambio, -- TipoCambio - money
-					@Fecha -- Fecha - date
-					);
+		IF	(SELECT COUNT(*) FROM dbo.Divisas WHERE Fecha = @Fecha AND Moneda = @ID_MONEDA) > 0 
+		BEGIN
+			UPDATE dbo.Divisas SET dbo.Divisas.TipoCambio = @Cambio WHERE Fecha = @Fecha AND Moneda = @ID_MONEDA;
+			SET @MENSAJE	= 'UPDATE PAIS= ' + @Pais;
+			INSERT INTO Bitacora(Usuario,Fecha,Mensaje)  VALUES (@USUARIO,@FECHA,@MENSAJE);
+		END
 		ELSE
-			PRINT N'MONEDA NO RECONOCIDA';
-END;
+		BEGIN	
+			INSERT INTO dbo.Divisas(Moneda,TipoCambio,Fecha) VALUES (
+			    @ID_MONEDA, -- Moneda - int
+			    @Cambio, -- TipoCambio - money
+				@Fecha -- Fecha - date
+				);
+			SET @MENSAJE = 'INSERT PAIS= ' + @Pais;
+			INSERT INTO Bitacora(Usuario,Fecha,Mensaje)  VALUES (@USUARIO,@FECHA,@MENSAJE);
+		END
+END
 GO
 exit
