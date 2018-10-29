@@ -50,6 +50,14 @@ ini_set('display_errors', true);
 			fclose($file);
 		}
 		
+		private function GuardaBitacora($mensaje)
+		{
+			$file = fopen("../log.log", "a");
+			$date = exec("date");
+			fwrite($file,$date.",".$mensaje."PAIS:".$this -> pais."\n");
+			fclose($file);
+		}
+
 		private function ArmaMexURL()
 		{
 			/*Esta funcion recibe la variable $fecha
@@ -371,6 +379,8 @@ ini_set('display_errors', true);
 		{
 			$this -> conn = new Conexion();
 			$this -> query = "EXEC INSERTA_DIVISA @Pais =".$this ->pais." ,@Cambio =\"".$this -> divisa."\" ,@Fecha =\"".$this -> fechasql."\"";
+			$mensaje = $this -> query;
+			$this -> GuardaBitacora($mensaje);
 			$result = mssql_query($this -> query); // PREPARAMOS
 			if (!$result ) //VERIFICAMOS ERRORES
     		{
