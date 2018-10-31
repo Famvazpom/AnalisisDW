@@ -166,15 +166,9 @@ ini_set('display_errors', true);
 			$this -> InsertaDB();
 			//Insertar a la base de datos
 		}
+		
+
 		private function ArmaCanURLXML()
-		{
-			$this -> url = "https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/json?start_date=".$this -> fecha;
-			$this -> archivo = "canada.txt";
-			$this -> pais = "\"CANADA\"";
-
-		}
-
-		private function ArmaCanCSVURLXML()
 		{
 			$this -> url = "https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/xml?start_date=".$this -> fecha;
 			$this -> archivo = "Can.xml";
@@ -194,7 +188,7 @@ ini_set('display_errors', true);
 			unlink("../".$this -> archivo);
 			$this -> fechasql = exec("echo ".$this -> fecha."|tr '-' '/'");
 			echo "<br>".$this -> fechasql;
-			$this -> InsertaDB();
+			//$this -> InsertaDB();
 			//Insertar a la base de datos
 		}
 
@@ -530,7 +524,7 @@ $meh -> DivisaArgen("29","10","2018");
 echo "<br>UNION EUROPEA: ";
 $meh -> DivisaUnEur("29","Oct","2018");
 
-echo "<br>CANADA CSV: ";
+
 $meh -> DivisaCanCSV("2018-10-29");
 
 echo "<br>COLOMBIA: ";
@@ -538,5 +532,7 @@ $meh -> DivisaCol("10/29/2018");
 
 echo "<br>REPUBLICA DOMINICANA: ";
 $meh -> DivisaRepDom();
+echo "<br>CANADA XML: ";
+$meh -> DivisaCanXML("2018-10-29");
 
 ?>
