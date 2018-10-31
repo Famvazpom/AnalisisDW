@@ -471,25 +471,25 @@ ini_set('display_errors', true);
 $meh = new Operaciones();
 
 echo "<br>MEXICO: ";
-$meh -> DivisaMexico("11/06/2018");
+$meh -> DivisaMexico("29/10/2018");
 
 echo "<br>BRAZIL: ";
 $meh -> DivisaBrazil();
 
 echo "<br>CANADA: ";
-$meh -> DivisaCan("2018-10-17");
+$meh -> DivisaCan("2018-10-29");
 
 echo "<br>ARGENTINA: ";
-$meh -> DivisaArgen("08","06","2018");
+$meh -> DivisaArgen("29","10","2018");
 
 echo "<br>UNION EUROPEA: ";
-$meh -> DivisaUnEur("15","Oct","2018");
+$meh -> DivisaUnEur("29","Oct","2018");
 
 echo "<br>CANADA CSV: ";
-$meh -> DivisaCanCSV("2018-10-17");
+$meh -> DivisaCanCSV("2018-10-29");
 
 echo "<br>COLOMBIA: ";
-$meh -> DivisaCol("10/11/2018");
+$meh -> DivisaCol("10/29/2018");
 
 echo "<br>REPUBLICA DOMINICANA: ";
 $meh -> DivisaRepDom();
