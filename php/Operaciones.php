@@ -166,6 +166,37 @@ ini_set('display_errors', true);
 			$this -> InsertaDB();
 			//Insertar a la base de datos
 		}
+		private function ArmaCanURLXML()
+		{
+			$this -> url = "https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/json?start_date=".$this -> fecha;
+			$this -> archivo = "canada.txt";
+			$this -> pais = "\"CANADA\"";
+
+		}
+
+		private function ArmaCanCSVURLXML()
+		{
+			$this -> url = "https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/xml?start_date=".$this -> fecha;
+			$this -> archivo = "Can.xml";
+			$this -> pais = "\"CANADA\"";
+		}
+
+		private function ObtieneDivisaCanadaXML()
+		{
+			$this -> divisa = exec("./../sh/DivisaCanXML.sh ".$this -> fecha." 2>&1");
+			if ($this -> divisa == null) {
+				$mensaje = "ERROR 1: Fecha invalida, puede ser una fecha posterior a la actual, el formato de la fecha no es valido o la fecha esta situada en fin de semana";
+				$this -> GuardaErrores($mensaje);
+				unlink("../".$this -> archivo);
+				return;
+			}
+			echo $this -> divisa;
+			unlink("../".$this -> archivo);
+			$this -> fechasql = exec("echo ".$this -> fecha."|tr '-' '/'");
+			echo "<br>".$this -> fechasql;
+			$this -> InsertaDB();
+			//Insertar a la base de datos
+		}
 
 		private function ObtieneDivisaCanadaCSV()
 		{
@@ -209,6 +240,20 @@ ini_set('display_errors', true);
 			$this -> ArmaCanCSVURL();
 			$this -> DescargaArchivo();
 			$this -> ObtieneDivisaCanadaCSV();
+		}
+		
+		public function DivisaCanXML($fecha)
+		{
+			/*
+				Formato de fecha para Canada
+					$fecha = YYYY-MM-DD
+				Ejemplo
+					$fecha = 2018-06-10
+			*/
+			$this -> fecha = $fecha;
+			$this -> ArmaCanURLXML();
+			$this -> DescargaArchivo();
+			$this -> ObtieneDivisaCanadaXML();
 		}
 
 		private function ArmaUnEurlink()
